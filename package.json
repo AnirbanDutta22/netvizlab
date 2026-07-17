@@ -1,5 +1,5 @@
 {
-  "name": "netviz",
+  "name": "netvizlab",
   "private": true,
   "version": "1.0.0",
   "description": "Interactive networking command visualizer (currently Ping; more to be added) with real-time WebSocket streaming and rich visualizations.",

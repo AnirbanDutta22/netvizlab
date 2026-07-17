@@ -1,5 +1,5 @@
 {
-  "name": "@netviz/shared",
+  "name": "@netvizlab/shared",
   "private": true,
   "version": "1.0.0",
   "description": "Types, DTOs, error contracts, and constants shared between the Network Visualizer client and server. No build step — consumed directly as TypeScript source by both Vite (client) and tsx (server).",
