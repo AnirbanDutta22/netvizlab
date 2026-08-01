@@ -13,10 +13,7 @@ export const runPingWorker = (
   request: PingRequestDto,
   signal: AbortSignal,
 ): Result<RunningProcess, AppError> => {
-  const args =
-    process.platform === "win32"
-      ? ["-n", String(request.count), request.host]
-      : ["-c", String(request.count), request.host];
+  const args = ["-c", String(request.count), request.host];
 
   return spawnWhitelistedCommand("ping", args, {
     timeoutMs: PING_LIMITS.TIMEOUT_MS,
