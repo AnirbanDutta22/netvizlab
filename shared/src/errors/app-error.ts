@@ -7,6 +7,7 @@ export type AppErrorCode =
   | "DNS_RESOLUTION_ERROR"
   | "NETWORK_UNREACHABLE"
   | "PARSER_ERROR"
+  | "WORKER_SPAWN_ERROR"
   | "RATE_LIMITED"
   | "INTERNAL_ERROR";
 
@@ -22,6 +23,7 @@ export type CommandTimeoutError = BaseAppError<"COMMAND_TIMEOUT">;
 export type DnsResolutionError = BaseAppError<"DNS_RESOLUTION_ERROR">;
 export type NetworkUnreachableError = BaseAppError<"NETWORK_UNREACHABLE">;
 export type ParserError = BaseAppError<"PARSER_ERROR">;
+export type WorkerSpawnError = BaseAppError<"WORKER_SPAWN_ERROR">;
 export type RateLimitedError = BaseAppError<"RATE_LIMITED">;
 export type InternalError = BaseAppError<"INTERNAL_ERROR">;
 
@@ -32,6 +34,7 @@ export type AppError =
   | DnsResolutionError
   | NetworkUnreachableError
   | ParserError
+  | WorkerSpawnError
   | RateLimitedError
   | InternalError;
 

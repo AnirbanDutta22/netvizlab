@@ -1,4 +1,4 @@
-import { AppError } from "../errors/app-error";
+import { AppError } from "../errors/app-error.js";
 
 export interface PingRequestDto {
   readonly host: string;
