@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  /* Backgrounds */
+  --color-bg: #0b0e14;
+  --color-bg-panel: #12151c;
+  --color-bg-raised: #171b24;
+  --color-bg-hairline: #1e2230;
+
+  /* Text */
+  --color-ink: #e6e9f0;
+  --color-ink-muted: #8b93a7;
+  --color-ink-faint: #5a6172;
+
+  /* Status */
+  --color-signal: #4fd1ff;
+  --color-signal-dim: #1e5c6e;
+
+  --color-healthy: #5fe38c;
+  --color-degraded: #ffb454;
+  --color-loss: #ff5c7a;
+
+  /* Fonts */
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: Inter, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Shadows */
+  --shadow-glow: 0 0 24px -4px rgba(79, 209, 255, 0.45);
+
+  /* Animations */
+  --animate-packet-pulse: packet-pulse 1.4s ease-in-out infinite;
+}
+
+@layer base {
+  * {
+    @apply border-bg-hairline;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-signal) 30%, transparent);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-bg-hairline);
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-ink-faint);
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@keyframes packet-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
