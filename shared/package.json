@@ -1,12 +1,19 @@
 {
   "name": "@netvizlab/shared",
   "private": true,
-  "version": "1.0.0",
-  "description": "Types, DTOs, error contracts, and constants shared between the Network Visualizer client and server. No build step — consumed directly as TypeScript source by both Vite (client) and tsx (server).",
+  "version": "0.1.0",
+  "description": "Types, DTOs, error contracts, and constants shared between the Network Visualizer client and server. Compiled to plain JS so it can be imported by both the tsx-powered server in dev/prod and bundled by Vite for the client.",
   "type": "module",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput"
   }
 }
