@@ -5,12 +5,10 @@
     "moduleResolution": "NodeNext",
     "lib": ["ES2022"],
     "outDir": "dist",
-    "rootDir": "..",
+    "rootDir": "src",
     "types": ["node"],
     "paths": {
-      "@/*": ["src/*"],
-      "@netvizlab/shared": ["../shared/src/index.ts"],
-      "@netvizlab/shared/*": ["../shared/src/*"]
+      "@/*": ["./src/*"]
     },
     "strict": true,
     "noImplicitAny": true,

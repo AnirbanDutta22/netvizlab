@@ -1,4 +1,4 @@
-import { childLogger } from "@/logger/index.js";
+import { childLogger } from "../../logger/index.js";
 import { AppError, createAppError, err, ok, Result } from "@netvizlab/shared";
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";
