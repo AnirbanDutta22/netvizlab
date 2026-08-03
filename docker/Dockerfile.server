@@ -1,0 +1,50 @@
+# build stage
+FROM node:24-bookworm-slim AS build
+
+WORKDIR /workspace
+
+COPY package.json package-lock.json* ./
+COPY shared/package.json shared/package.json
+COPY server/package.json server/package.json
+COPY client/package.json client/package.json
+
+RUN npm install
+
+COPY shared shared
+COPY server server
+
+RUN npm run build -w shared && npm run build -w server
+
+# runtime stage
+FROM node:24-bookworm-slim AS runtime
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+     iputils-ping \
+     ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd --gid 1001 netvizlab && useradd --uid 1001 --gid netvizlab --shell /bin/bash --create-home netvizlab
+
+WORKDIR /app
+
+# Only production dependencies for the server + shared, nothing else.
+COPY --from=build /workspace/package.json /workspace/package-lock.json* ./
+COPY --from=build /workspace/shared/package.json shared/package.json
+COPY --from=build /workspace/server/package.json server/package.json
+COPY --from=build /workspace/client/package.json client/package.json
+RUN npm install --workspace=server --workspace=shared --omit=dev --ignore-scripts
+
+COPY --from=build /workspace/shared/dist shared/dist
+COPY --from=build /workspace/server/dist server/dist
+
+RUN chown -R netvizlab:netvizlab /app
+USER netvizlab
+
+ENV NODE_ENV=production
+EXPOSE 4000
+
+HEALTHCHECK --interval=15s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "fetch('http://localhost:4000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+
+CMD ["node", "server/dist/index.js"]

@@ -1,0 +1,36 @@
+# build stage
+FROM node:24-bookworm-slim AS build
+
+ARG VITE_WS_URL=ws://localhost:4000/ws
+ENV VITE_WS_URL=$VITE_WS_URL
+
+WORKDIR /workspace
+
+COPY package.json package-lock.json* ./
+COPY shared/package.json shared/package.json
+COPY server/package.json server/package.json
+COPY client/package.json client/package.json
+
+RUN npm install
+
+COPY shared shared
+COPY client client
+
+RUN npm run build -w client
+
+# runtime stage
+FROM node:24-alpine AS runtime
+
+WORKDIR /app
+
+# Lightweight static file server
+RUN npm install -g serve
+
+COPY --from=build /workspace/client/dist ./dist
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=15s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget -qO- http://localhost:8080 >/dev/null || exit 1
+
+CMD ["serve", "-s", "dist", "-l", "8080"]
