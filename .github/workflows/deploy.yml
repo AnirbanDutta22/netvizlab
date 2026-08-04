@@ -22,7 +22,7 @@ jobs:
       - name: Prepare production docker-compose file
         run: |
           mkdir -p deploy
-          cat < deploy/docker-compose.prod.yml
+          cat << 'EOF' > deploy/docker-compose.prod.yml
           services:
             server:
               image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPO }}/server:latest
