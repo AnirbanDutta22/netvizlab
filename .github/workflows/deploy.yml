@@ -1,0 +1,88 @@
+name: CD - Deploy to GCP VM
+
+on:
+  workflow_run:
+    workflows: ["Docker - Build and Push"]
+    branches: ["master"]
+    types:
+      - completed
+
+env:
+  GAR_LOCATION: asia-south1
+  GAR_REPO: netvizlab-repo
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare production docker-compose file
+        run: |
+          mkdir -p deploy
+          cat < deploy/docker-compose.prod.yml
+          services:
+            server:
+              image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPO }}/server:latest
+              restart: unless-stopped
+              ports:
+                - "4000:4000"
+              environment:
+                NODE_ENV: production
+                PORT: 4000
+                LOG_LEVEL: info
+                CORS_ORIGIN: "${{ secrets.CORS_ORIGIN }}"
+                RATE_LIMIT_WINDOW_MS: 60000
+                RATE_LIMIT_MAX_REQUESTS: 30
+                MAX_CONCURRENT_SESSIONS_PER_SOCKET: 3
+              cap_add:
+                - NET_RAW
+              networks:
+                - netvizlab
+
+            client:
+              image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPO }}/client:latest
+              restart: unless-stopped
+              ports:
+                - "8080:8080"
+              depends_on:
+                - server
+              networks:
+                - netvizlab
+
+          networks:
+            netvizlab:
+              driver: bridge
+          EOF
+
+      - name: Copy Compose File to VM via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          source: "deploy/docker-compose.prod.yml"
+          target: "~/app"
+
+      - name: Pull and Run Containers via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cd ~/app/deploy
+
+            # Authenticate GCP Artifact Registry for Docker on the VM
+            gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev -q
+
+            # Pull pre-built images directly (no building on VM)
+            docker compose -f docker-compose.prod.yml pull
+
+            # Recreate containers with new images
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+            # Prune dangling/old images to save VM disk space
+            docker image prune -f
