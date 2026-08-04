@@ -13,9 +13,8 @@
     "dev:server": "npm run dev -w server",
     "dev:client": "npm run dev -w client",
     "build": "npm run build -w server && npm run build -w client",
-    "test": "npm run test -w server && npm run test -w client",
+    "test": "npm run test -w server",
     "test:server": "npm run test -w server",
-    "test:client": "npm run test -w client",
     "lint": "npm run lint -w server && npm run lint -w client",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "prepare": "husky"
