@@ -1,4 +1,4 @@
-import { PingRequestDto } from "./ping.types.js";
+import type { PingRequestDto } from "./ping.types.js";
 
 export type ClientMessage =
   | {
