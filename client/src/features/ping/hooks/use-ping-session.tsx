@@ -11,6 +11,7 @@ import type {
 import { commandSocket } from "../../../shared/ws/socket-client";
 import { useAppDispatch } from "../../../app/hooks";
 import { logActivity } from "../../../shared/store/activity-log.slice";
+import { generateId } from "../../../shared/utils/generate-id";
 
 export type PingStatus = "idle" | "running" | "completed" | "error";
 
@@ -44,7 +45,7 @@ export const usePingSession = () => {
     (request: PingRequestDto) => {
       unsubscribeRef.current?.();
 
-      const sessionId = crypto.randomUUID();
+      const sessionId = generateId();
       sessionIdRef.current = sessionId;
       setState({ ...INITIAL_STATE, status: "running", host: request.host });
 
